@@ -1,4 +1,4 @@
-<h1 align="center">llm-eval-action</h1>
+<h1 align="center">LLM Eval Action</h1>
 
 <p align="center">
   <em>A GitHub Action that gates pull requests on statistically tested LLM evaluation regressions.</em>
@@ -6,23 +6,23 @@
 
 <p align="center">
   <a href="https://github.com/adeoluo/llm-eval-action/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/adeoluo/llm-eval-action/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="https://github.com/adeoluo/llm-eval-action/actions/workflows/test-action.yml"><img alt="Test action" src="https://github.com/adeoluo/llm-eval-action/actions/workflows/test-action.yml/badge.svg"></a>
-  <a href="https://github.com/adeoluo/llm-eval-action/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/adeoluo/llm-eval-action/actions/workflows/codeql.yml/badge.svg"></a>
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25%20lines-brightgreen">
-  <img alt="Runtime" src="https://img.shields.io/badge/runtime-node24-blue">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
+  <a href="https://github.com/adeoluo/llm-eval-action/releases"><img alt="Release" src="https://img.shields.io/github/v/release/adeoluo/llm-eval-action"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/typescript-6-3178C6">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
 ---
 
-```yaml
-- uses: adeoluo/llm-eval-action@v0
-  with:
-    results: eval/pr.jsonl
-    baseline: eval/baseline.jsonl
-```
+## Motivation
 
-## What it is
+A change to a prompt, a model version, or a retrieval step moves evaluation scores by a
+point or two, and so does rerunning the same system on a different sample. A gate that
+fails on any drop below the baseline fails about half of all unchanged pull requests (see
+[Results](#results)); a gate with a loose fixed threshold misses real regressions
+on small eval sets. Treating the comparison as a paired experiment fixes both: the same
+examples are scored twice, so the per-example differences carry far less noise than two
+independent accuracy numbers, and a significance test decides whether the drop is larger
+than that noise.
 
 `llm-eval-action` compares the per-example evaluation results of a pull request against a
 baseline run and fails the check when a metric regresses. It pairs examples by id, runs
@@ -30,74 +30,149 @@ the appropriate paired significance test for each metric, and writes a pass/fail
 the job summary, so a reviewer sees the size of the change, its uncertainty, and the
 examples that got worse without leaving the pull request.
 
-## Why
-
-A change to a prompt, a model version, or a retrieval step moves evaluation scores by a
-point or two, and so does rerunning the same system on a different sample. A gate that
-fails on any drop below the baseline fails about half of all unchanged pull requests (see
-[Evaluation](#evaluation)); a gate with a loose fixed threshold misses real regressions
-on small eval sets. Treating the comparison as a paired experiment fixes both: the same
-examples are scored twice, so the per-example differences carry far less noise than two
-independent accuracy numbers, and a significance test decides whether the drop is larger
-than that noise.
-
 ## Architecture
 
-```mermaid
----
-title: llm-eval-action - data flow inside one workflow step
-config:
-  theme: base
-  themeVariables:
-    fontFamily: "Inter, system-ui, sans-serif"
-    primaryColor: "#F8FAFC"
-    primaryBorderColor: "#1E293B"
-    primaryTextColor: "#1E293B"
-    lineColor: "#64748B"
-    clusterBkg: "#E2E8F0"
-    clusterBorder: "#94A3B8"
----
-flowchart LR
-    classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef external fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
-    classDef danger   fill:#EF4444,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-
-    PR[(PR results<br/>JSONL / JSON)]:::data
-    Base[(Baseline file)]:::data
-    Art([Workflow artifact<br/>from main]):::external
-
-    subgraph Action["llm-eval-action (node24, dist/index.js)"]
-        Inputs[inputs.ts<br/>validate inputs]:::core
-        Parse[parse.ts<br/>normalize records]:::core
-        Align[align.ts<br/>pair by id]:::core
-        Stats[stats.ts<br/>bootstrap CI, McNemar,<br/>paired t, Cohen's d]:::core
-        Analyze[analyze.ts<br/>verdict per metric,<br/>latency, cost]:::core
-        Report[report.ts<br/>Markdown report]:::core
-    end
-
-    Summary([Job summary]):::external
-    Outputs([Step outputs<br/>passed, deltas]):::external
-    Comment([PR comment<br/>opt-in]):::external
-    Fail{{core.setFailed}}:::danger
-
-    Art -- "baseline-artifact" --> Base
-    PR --> Parse
-    Base --> Parse
-    Inputs --> Analyze
-    Parse --> Align --> Stats --> Analyze --> Report
-    Report --> Summary
-    Report --> Comment
-    Analyze --> Outputs
-    Analyze -- "regression" --> Fail
-```
+<p align="center">
+  <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
+</p>
 
 Every module except `runtime.ts` (the thin adapter over `@actions/core`, `@actions/github`
 and `@actions/artifact`) is a pure function of its inputs, which keeps the statistics
 testable without a runner. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the
 [architecture decision records](docs/adr/).
 
-## Install
+### Statistical method
+
+For each metric the action keeps only examples whose id appears in both files with that
+metric, and forms the paired differences `d_i = candidate_i - baseline_i`.
+
+- **Delta**: the mean of `d_i`, which equals the difference of the two means on the
+  aligned set.
+- **Confidence interval**: a paired percentile bootstrap. Each of `bootstrap-samples`
+  resamples draws `n` example indices with replacement and averages their `d_i`, so the
+  baseline and candidate scores of an example always move together. The generator is
+  Mulberry32 with a fixed `seed` and ids are sorted before resampling, so the same files
+  always give the same interval.
+- **p-value, binary metrics** (every value 0 or 1 in both runs): the exact McNemar test.
+  Only discordant examples carry information: `b` examples the baseline got right and the
+  candidate got wrong, and `c` the reverse. Under "no change", `b ~ Binomial(b + c, 1/2)`,
+  and the two-sided p-value is `min(1, 2 * P(X <= min(b, c)))`. For example, `b = 10,
+c = 2` gives `2 * (1 + 12 + 66) / 4096 = 0.0386`.
+- **p-value, other metrics**: the paired t-test, `t = mean(d) / (sd(d) / sqrt(n))` with
+  `n - 1` degrees of freedom, using the regularized incomplete beta function for the t
+  distribution.
+- **Effect size**: Cohen's d for paired data (d_z), `mean(d) / sd(d)`. Roughly 0.2 is a
+  small effect, 0.5 medium and 0.8 large.
+- **Verdict**: `drop` is `-delta` (or `+delta` for `lower-is-better` metrics). In
+  `threshold` mode a metric regresses when `drop > max-drop`. In `significance` mode it
+  regresses when `drop > max-drop` and `p < alpha`. A drop beyond the threshold that is
+  not significant is shown as a warning, not a failure.
+- **Latency and cost**: p50 and p95 (linear interpolation, as NumPy) and totals over
+  examples present in both runs, reported as relative changes and optionally gated.
+- **Per-example regressions**: the examples with the largest drop across the gated
+  metrics, to start debugging from.
+
+The t-test, incomplete beta, McNemar and quantile implementations are checked in the
+unit tests against SciPy and NumPy reference values and closed forms (for example, the
+t distribution with 1 and 2 degrees of freedom).
+
+## Results
+
+`npm run bench` reproduces these numbers (seeded; full output in
+[benchmarks/results.md](benchmarks/results.md)).
+
+**Calibration.** Share of 2,000 simulated pull requests per row that each gate flags as a
+regression. Rows with a true drop of 0 measure the false positive rate. Binary metric:
+80% base accuracy with 20% of items rescored per run; continuous metric: per-item noise
+with SD 0.15.
+
+| Metric     |    n | True drop | Threshold mode, max-drop 0 | Threshold mode, max-drop 0.02 | Significance mode |
+| ---------- | ---: | --------: | -------------------------: | ----------------------------: | ----------------: |
+| binary     |  200 |  0 (null) |                      43.4% |                         15.0% |              1.1% |
+| binary     |  200 |      0.02 |                      81.4% |                         51.9% |             12.0% |
+| binary     |  200 |      0.05 |                      99.3% |                         93.3% |             56.9% |
+| binary     | 1000 |  0 (null) |                      47.3% |                          0.8% |              2.1% |
+| binary     | 1000 |      0.02 |                      98.5% |                         50.7% |             59.2% |
+| binary     | 1000 |      0.05 |                     100.0% |                        100.0% |            100.0% |
+| continuous |  200 |  0 (null) |                      49.0% |                          2.6% |              2.1% |
+| continuous |  200 |      0.02 |                      97.1% |                         49.4% |             45.9% |
+| continuous |  200 |      0.05 |                     100.0% |                         99.6% |             99.6% |
+| continuous | 1000 |  0 (null) |                      49.4% |                          0.0% |              2.1% |
+| continuous | 1000 |      0.02 |                     100.0% |                         48.7% |             99.0% |
+| continuous | 1000 |      0.05 |                     100.0% |                        100.0% |            100.0% |
+
+The "any drop" gate (`threshold`, `max-drop: 0`) flags 43 to 49% of unchanged pull
+requests. A fixed allowance trades false positives against power and depends on `n`
+(15.0% false positives at n = 200, binary). Significance mode stays near or below
+`alpha / 2 = 2.5%` for a one-directional regression at every size (the exact McNemar test
+is conservative at small `n`) while its power grows with `n`: a 2-point drop is caught
+59% of the time at n = 1,000 for the binary metric and 99% for the continuous one.
+
+**Runtime** of the full analysis (two metrics, 10,000 bootstrap resamples), measured on
+an Apple Silicon laptop with Node 26:
+
+| Examples | Median time (ms) |
+| -------: | ---------------: |
+|      100 |             13.7 |
+|    1,000 |            139.2 |
+|   10,000 |           2155.4 |
+|   50,000 |           7682.4 |
+
+The bootstrap dominates and grows with `n * bootstrap-samples`; lower `bootstrap-samples`
+for very large eval sets. The pass/fail verdict does not depend on it.
+
+### Sample report
+
+This is the job summary for the regression fixture (`npm run report:sample` regenerates
+[docs/sample-report.md](docs/sample-report.md)); the passing and failing self-test runs
+produce the same layout in the
+[Test action workflow](https://github.com/adeoluo/llm-eval-action/actions/workflows/test-action.yml).
+
+#### LLM evaluation gate: :x: failed
+
+**Mode:** significance (fail when a drop exceeds the allowed drop and p < 0.05)  
+**Baseline:** `__fixtures__/baseline.jsonl` (200 examples)  
+**Candidate:** `__fixtures__/candidate-regression.jsonl` (200 examples)  
+**Aligned by id:** 200 examples; bootstrap 10000 resamples, seed 1234
+
+| Metric      |   n | Baseline | Candidate |   Delta | 95% CI             |  p-value | Test                              | Cohen's d | Allowed drop | Status         |
+| ----------- | --: | -------: | --------: | ------: | ------------------ | -------: | --------------------------------- | --------: | -----------: | -------------- |
+| exact_match | 200 |   0.7500 |    0.6650 | -0.0850 | [-0.1300, -0.0450] |   0.0002 | McNemar exact (19 lost, 2 gained) |     -0.27 |       0.0100 | :x: regression |
+| f1          | 200 |   0.7066 |    0.6257 | -0.0809 | [-0.1113, -0.0528] | < 0.0001 | paired t                          |     -0.39 |       0.0100 | :x: regression |
+
+##### Latency and cost
+
+| Measure                     |   n | Baseline | Candidate | Change |
+| --------------------------- | --: | -------: | --------: | -----: |
+| Latency p50 (ms)            | 200 |    538.7 |     730.4 | +35.6% |
+| Latency p95 (ms)            | 200 |    944.3 |    1257.6 | +33.2% |
+| Total cost (USD)            | 200 |   0.1103 |    0.1102 |  -0.1% |
+| Mean cost per example (USD) | 200 | 0.000551 |  0.000551 |  -0.1% |
+
+##### Budget checks
+
+| Check                |  Limit | Observed | Status   |
+| -------------------- | -----: | -------: | -------- |
+| latency p95 increase | +20.0% |   +33.2% | :x: fail |
+
+<details>
+<summary>Largest per-example regressions (top 5)</summary>
+
+| Example id | Metric      | Baseline | Candidate |   Delta |
+| ---------- | ----------- | -------: | --------: | ------: |
+| `q014`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
+| `q033`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
+| `q041`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
+| `q051`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
+| `q064`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
+
+</details>
+
+<sub>Delta is candidate minus baseline. The 95% CI is a seeded paired bootstrap of the mean difference. Binary metrics use the exact McNemar test; other metrics use a paired t-test. Cohen's d is the paired effect size (mean difference over its standard deviation). Generated by llm-eval-action.</sub>
+
+## Quickstart
+
+### Install
 
 There is nothing to install. Reference the action from any workflow:
 
@@ -109,7 +184,7 @@ uses: adeoluo/llm-eval-action@v0
 for fully reproducible workflows. While the action is at `0.x`, input names may still
 change between minor versions; every change is listed in [CHANGELOG.md](CHANGELOG.md).
 
-## Quickstart
+### Add a gate
 
 1. Make your eval script write one JSON object per example:
 
@@ -305,90 +380,6 @@ distinct `title` per gate when one workflow runs several gates.
 | `deltas`            | JSON keyed by metric: `n`, `baseline`, `candidate`, `delta`, `ci_low`, `ci_high`, `p_value`, `test`, `cohens_d`, `max_drop`, `regressed`. |
 | `regressed-metrics` | Comma separated metrics that regressed.                                                                                                   |
 
-## Statistical method
-
-For each metric the action keeps only examples whose id appears in both files with that
-metric, and forms the paired differences `d_i = candidate_i - baseline_i`.
-
-- **Delta**: the mean of `d_i`, which equals the difference of the two means on the
-  aligned set.
-- **Confidence interval**: a paired percentile bootstrap. Each of `bootstrap-samples`
-  resamples draws `n` example indices with replacement and averages their `d_i`, so the
-  baseline and candidate scores of an example always move together. The generator is
-  Mulberry32 with a fixed `seed` and ids are sorted before resampling, so the same files
-  always give the same interval.
-- **p-value, binary metrics** (every value 0 or 1 in both runs): the exact McNemar test.
-  Only discordant examples carry information: `b` examples the baseline got right and the
-  candidate got wrong, and `c` the reverse. Under "no change", `b ~ Binomial(b + c, 1/2)`,
-  and the two-sided p-value is `min(1, 2 * P(X <= min(b, c)))`. For example, `b = 10,
-c = 2` gives `2 * (1 + 12 + 66) / 4096 = 0.0386`.
-- **p-value, other metrics**: the paired t-test, `t = mean(d) / (sd(d) / sqrt(n))` with
-  `n - 1` degrees of freedom, using the regularized incomplete beta function for the t
-  distribution.
-- **Effect size**: Cohen's d for paired data (d_z), `mean(d) / sd(d)`. Roughly 0.2 is a
-  small effect, 0.5 medium and 0.8 large.
-- **Verdict**: `drop` is `-delta` (or `+delta` for `lower-is-better` metrics). In
-  `threshold` mode a metric regresses when `drop > max-drop`. In `significance` mode it
-  regresses when `drop > max-drop` and `p < alpha`. A drop beyond the threshold that is
-  not significant is shown as a warning, not a failure.
-- **Latency and cost**: p50 and p95 (linear interpolation, as NumPy) and totals over
-  examples present in both runs, reported as relative changes and optionally gated.
-- **Per-example regressions**: the examples with the largest drop across the gated
-  metrics, to start debugging from.
-
-The t-test, incomplete beta, McNemar and quantile implementations are checked in the
-unit tests against SciPy and NumPy reference values and closed forms (for example, the
-t distribution with 1 and 2 degrees of freedom).
-
-## Sample report
-
-This is the job summary for the regression fixture (`npm run report:sample` regenerates
-[docs/sample-report.md](docs/sample-report.md)); the passing and failing self-test runs
-produce the same layout in the
-[Test action workflow](https://github.com/adeoluo/llm-eval-action/actions/workflows/test-action.yml).
-
-## LLM evaluation gate: :x: failed
-
-**Mode:** significance (fail when a drop exceeds the allowed drop and p < 0.05)  
-**Baseline:** `__fixtures__/baseline.jsonl` (200 examples)  
-**Candidate:** `__fixtures__/candidate-regression.jsonl` (200 examples)  
-**Aligned by id:** 200 examples; bootstrap 10000 resamples, seed 1234
-
-| Metric      |   n | Baseline | Candidate |   Delta | 95% CI             |  p-value | Test                              | Cohen's d | Allowed drop | Status         |
-| ----------- | --: | -------: | --------: | ------: | ------------------ | -------: | --------------------------------- | --------: | -----------: | -------------- |
-| exact_match | 200 |   0.7500 |    0.6650 | -0.0850 | [-0.1300, -0.0450] |   0.0002 | McNemar exact (19 lost, 2 gained) |     -0.27 |       0.0100 | :x: regression |
-| f1          | 200 |   0.7066 |    0.6257 | -0.0809 | [-0.1113, -0.0528] | < 0.0001 | paired t                          |     -0.39 |       0.0100 | :x: regression |
-
-### Latency and cost
-
-| Measure                     |   n | Baseline | Candidate | Change |
-| --------------------------- | --: | -------: | --------: | -----: |
-| Latency p50 (ms)            | 200 |    538.7 |     730.4 | +35.6% |
-| Latency p95 (ms)            | 200 |    944.3 |    1257.6 | +33.2% |
-| Total cost (USD)            | 200 |   0.1103 |    0.1102 |  -0.1% |
-| Mean cost per example (USD) | 200 | 0.000551 |  0.000551 |  -0.1% |
-
-### Budget checks
-
-| Check                |  Limit | Observed | Status   |
-| -------------------- | -----: | -------: | -------- |
-| latency p95 increase | +20.0% |   +33.2% | :x: fail |
-
-<details>
-<summary>Largest per-example regressions (top 5)</summary>
-
-| Example id | Metric      | Baseline | Candidate |   Delta |
-| ---------- | ----------- | -------: | --------: | ------: |
-| `q014`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
-| `q033`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
-| `q041`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
-| `q051`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
-| `q064`     | exact_match |   1.0000 |    0.0000 | -1.0000 |
-
-</details>
-
-<sub>Delta is candidate minus baseline. The 95% CI is a seeded paired bootstrap of the mean difference. Binary metrics use the exact McNemar test; other metrics use a paired t-test. Cohen's d is the paired effect size (mean difference over its standard deviation). Generated by llm-eval-action.</sub>
-
 ## Design decisions
 
 - **TypeScript JavaScript action, bundled into `dist/`** rather than a Docker or composite
@@ -424,50 +415,9 @@ make all        # format check, lint, typecheck, tests with coverage gate, build
   and a baseline loaded from an artifact uploaded earlier in the same run.
 - CI also checks that `dist/` matches a fresh build, and CodeQL scans the TypeScript.
 
-## Evaluation
+### Contributing and security
 
-`npm run bench` reproduces these numbers (seeded; full output in
-[benchmarks/results.md](benchmarks/results.md)).
-
-**Calibration.** Share of 2,000 simulated pull requests per row that each gate flags as a
-regression. Rows with a true drop of 0 measure the false positive rate. Binary metric:
-80% base accuracy with 20% of items rescored per run; continuous metric: per-item noise
-with SD 0.15.
-
-| Metric     |    n | True drop | Threshold mode, max-drop 0 | Threshold mode, max-drop 0.02 | Significance mode |
-| ---------- | ---: | --------: | -------------------------: | ----------------------------: | ----------------: |
-| binary     |  200 |  0 (null) |                      43.4% |                         15.0% |              1.1% |
-| binary     |  200 |      0.02 |                      81.4% |                         51.9% |             12.0% |
-| binary     |  200 |      0.05 |                      99.3% |                         93.3% |             56.9% |
-| binary     | 1000 |  0 (null) |                      47.3% |                          0.8% |              2.1% |
-| binary     | 1000 |      0.02 |                      98.5% |                         50.7% |             59.2% |
-| binary     | 1000 |      0.05 |                     100.0% |                        100.0% |            100.0% |
-| continuous |  200 |  0 (null) |                      49.0% |                          2.6% |              2.1% |
-| continuous |  200 |      0.02 |                      97.1% |                         49.4% |             45.9% |
-| continuous |  200 |      0.05 |                     100.0% |                         99.6% |             99.6% |
-| continuous | 1000 |  0 (null) |                      49.4% |                          0.0% |              2.1% |
-| continuous | 1000 |      0.02 |                     100.0% |                         48.7% |             99.0% |
-| continuous | 1000 |      0.05 |                     100.0% |                        100.0% |            100.0% |
-
-The "any drop" gate (`threshold`, `max-drop: 0`) flags 43 to 49% of unchanged pull
-requests. A fixed allowance trades false positives against power and depends on `n`
-(15.0% false positives at n = 200, binary). Significance mode stays near or below
-`alpha / 2 = 2.5%` for a one-directional regression at every size (the exact McNemar test
-is conservative at small `n`) while its power grows with `n`: a 2-point drop is caught
-59% of the time at n = 1,000 for the binary metric and 99% for the continuous one.
-
-**Runtime** of the full analysis (two metrics, 10,000 bootstrap resamples), measured on
-an Apple Silicon laptop with Node 26:
-
-| Examples | Median time (ms) |
-| -------: | ---------------: |
-|      100 |             13.7 |
-|    1,000 |            139.2 |
-|   10,000 |           2155.4 |
-|   50,000 |           7682.4 |
-
-The bootstrap dominates and grows with `n * bootstrap-samples`; lower `bootstrap-samples`
-for very large eval sets. The pass/fail verdict does not depend on it.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
 ## Limitations
 
@@ -497,10 +447,6 @@ for very large eval sets. The pass/fail verdict does not depend on it.
   significantly worse".
 - Wilcoxon signed-rank as an option for ordinal judge scores.
 
-## Contributing and security
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
-
 ## License
 
-MIT, see [LICENSE](LICENSE).
+Released under the [MIT License](LICENSE).

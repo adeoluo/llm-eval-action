@@ -1,0 +1,11 @@
+flowchart LR
+    PR[(PR results)] --> Parse[Parse records]
+    Base[(Baseline file or artifact)] --> Parse
+    Inputs[Validate inputs] --> Analyze
+    Parse --> Align[Pair by id]
+    Align --> Stats[Paired statistics]
+    Stats --> Analyze[Verdict per metric]
+    Analyze --> Report[Markdown report]
+    Report --> Summary([Job summary])
+    Report --> Comment([PR comment])
+    Analyze --> Outputs([Step outputs])
