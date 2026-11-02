@@ -387,6 +387,16 @@ distinct `title` per gate when one workflow runs several gates.
 | `deltas`            | JSON keyed by metric: `n`, `baseline`, `candidate`, `delta`, `ci_low`, `ci_high`, `p_value`, `test`, `cohens_d`, `max_drop`, `regressed`. |
 | `regressed-metrics` | Comma separated metrics that regressed.                                                                                                   |
 
+### Demos
+
+Recorded from real runs with [vhs](https://github.com/charmbracelet/vhs); each tape is in `docs/demo/`.
+
+Rendering the sample comparison report a pull request receives.
+
+<p align="center">
+  <img src="docs/demo/report.gif" alt="Rendering the sample comparison report a pull request receives" width="860">
+</p>
+
 ## Design decisions
 
 - **TypeScript JavaScript action, bundled into `dist/`** rather than a Docker or composite
