@@ -5,57 +5,45 @@ flowchart LR
     classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef obs      fill:#CBD5E1,stroke:#1E293B,color:#1E293B,stroke-width:1px;
 
-    Workflow([Workflow step<br/>uses: llm-eval-action]):::edge
-    GitHub([GitHub API<br/>artifacts and PR comments]):::edge
-
-    subgraph Interfaces["Interfaces (node24 bundle, dist/index.js)"]
+    subgraph Interfaces["Interfaces"]
         direction TB
-        Runtime["runtime.ts adapter<br/>@actions/core, github, artifact"]:::edge
-        Run["main.ts run()<br/>orchestration through Runtime"]:::core
-        Inputs["inputs.ts<br/>validate inputs and gate config"]:::control
+        Workflow([Workflow step<br/>with: inputs]):::edge
+        Runtime["runtime.ts adapter<br/>@actions packages"]:::edge
+        Run["main.ts run()<br/>orchestration"]:::core
+        Inputs["inputs.ts<br/>inputs and GateConfig"]:::control
+        Workflow --> Runtime --> Run --> Inputs
     end
 
-    subgraph State["Data and state (runner workspace)"]
+    subgraph State["Data and state"]
         direction TB
-        Results[("Candidate results<br/>JSONL, JSON, harness report")]:::data
-        Baseline[("Baseline file<br/>path or downloaded artifact")]:::data
-        Artifact["artifact.ts<br/>find and download baseline"]:::core
+        GitHub([GitHub artifacts<br/>baseline from main]):::edge
+        Artifact["artifact.ts<br/>download baseline"]:::core
+        Baseline[("Baseline results")]:::data
+        Results[("Candidate results<br/>JSONL or JSON")]:::data
+        GitHub --> Artifact --> Baseline ~~~ Results
     end
 
     subgraph Core["Analysis (pure functions)"]
         direction TB
-        Parse["parse.ts<br/>normalize records by id"]:::core
-        Align["align.ts<br/>pair shared ids per metric"]:::core
-        Stats["stats.ts<br/>bootstrap CI, McNemar, paired t, Cohen's d"]:::core
+        Parse["parse.ts<br/>records by id"]:::core
+        Align["align.ts<br/>pair shared ids"]:::core
         Random["random.ts<br/>seeded Mulberry32"]:::control
-        Analyze["analyze.ts<br/>verdicts, latency, cost, budgets"]:::core
-        Gate{"Pass or fail<br/>threshold or significance mode"}:::control
+        Stats["stats.ts<br/>CI, McNemar, t-test"]:::core
+        Analyze["analyze.ts<br/>verdicts and budgets"]:::core
+        Gate["Pass or fail<br/>threshold or p-value"]:::control
+        Random ~~~ Parse --> Align --> Stats --> Analyze --> Gate
     end
 
     subgraph Obs["Reports and outputs"]
         direction TB
-        Report["report.ts<br/>Markdown report, deltas JSON"]:::obs
+        Report["report.ts<br/>Markdown, deltas JSON"]:::obs
         Summary["Job summary<br/>and report file"]:::obs
-        Outputs["Step outputs<br/>passed, outcome, deltas"]:::obs
-        Comment["comment.ts<br/>upsert PR comment, opt-in"]:::obs
+        Comment["comment.ts<br/>opt-in PR comment"]:::obs
+        Outputs["Step outputs<br/>passed, deltas"]:::obs
+        Report --> Summary ~~~ Comment ~~~ Outputs
     end
 
-    Workflow -->|with: inputs| Runtime
-    Runtime -->|getInput| Run
-    Run -->|raw inputs| Inputs
-    Run -->|baseline-artifact set| Artifact
-    Artifact -->|download| GitHub
-    Artifact -->|file path| Baseline
-    Results -->|readFile| Parse
-    Baseline -->|readFile| Parse
-    Parse -->|ResultSet x2| Align
-    Align -->|paired differences| Stats
-    Random -.->|resample indices| Stats
-    Stats -->|CI, p-value, effect size| Analyze
-    Inputs -.->|GateConfig| Analyze
-    Analyze -->|regressed metrics, checks| Gate
-    Gate -->|AnalysisResult| Report
-    Report --> Summary
-    Gate -->|passed, or setFailed when fail-on-regression| Outputs
-    Report -->|comment-on-pr| Comment
-    Comment -->|create or update| GitHub
+    Interfaces -->|paths| State
+    State -->|files| Core
+    Interfaces -.->|GateConfig| Core
+    Core -->|result| Obs
