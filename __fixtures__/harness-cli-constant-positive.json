@@ -1,0 +1,356 @@
+{
+  "confidence": 0.95,
+  "results": [
+    {
+      "task": "sentiment",
+      "model": "constant-positive",
+      "seed": 0,
+      "count": 48,
+      "accuracy": {
+        "mean": 0.5,
+        "low": 0.3541666666666667,
+        "high": 0.6458333333333334,
+        "confidence": 0.95
+      },
+      "mean_latency_seconds": 1.4330968648816148e-07,
+      "examples": [
+        {
+          "id": "sentiment-000",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-001",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-002",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-003",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-004",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-005",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-006",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-007",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-008",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-009",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-010",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-011",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-012",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-013",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-014",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-015",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-016",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-017",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-018",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-019",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-020",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-021",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-022",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-023",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-024",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-025",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-026",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-027",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-028",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-029",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-030",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-031",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-032",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-033",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-034",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-035",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-036",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-037",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-038",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-039",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-040",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-041",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-042",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-043",
+          "prediction": "positive",
+          "target": "negative",
+          "score": 0.0,
+          "rationale": "selected A, correct is B"
+        },
+        {
+          "id": "sentiment-044",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-045",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-046",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        },
+        {
+          "id": "sentiment-047",
+          "prediction": "positive",
+          "target": "positive",
+          "score": 1.0,
+          "rationale": null
+        }
+      ]
+    }
+  ]
+}

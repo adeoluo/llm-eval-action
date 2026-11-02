@@ -1,0 +1,553 @@
+{
+  "label": "baseline-model",
+  "created_at": "2026-11-01T00:00:00+00:00",
+  "results": [
+    {
+      "task_name": "factual_qa",
+      "model_name": "baseline-model",
+      "seed": 0,
+      "examples": [
+        {
+          "input": "question q000",
+          "target": "answer q000",
+          "id": "q000",
+          "prediction": "answer q000",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7399
+        },
+        {
+          "input": "question q001",
+          "target": "answer q001",
+          "id": "q001",
+          "prediction": "answer q001",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7415
+        },
+        {
+          "input": "question q002",
+          "target": "answer q002",
+          "id": "q002",
+          "prediction": "answer q002",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.9002
+        },
+        {
+          "input": "question q003",
+          "target": "answer q003",
+          "id": "q003",
+          "prediction": "answer q003",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.5356
+        },
+        {
+          "input": "question q004",
+          "target": "answer q004",
+          "id": "q004",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4048
+        },
+        {
+          "input": "question q005",
+          "target": "answer q005",
+          "id": "q005",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.8483
+        },
+        {
+          "input": "question q006",
+          "target": "answer q006",
+          "id": "q006",
+          "prediction": "answer q006",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7761
+        },
+        {
+          "input": "question q007",
+          "target": "answer q007",
+          "id": "q007",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.852
+        },
+        {
+          "input": "question q008",
+          "target": "answer q008",
+          "id": "q008",
+          "prediction": "answer q008",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.6785
+        },
+        {
+          "input": "question q009",
+          "target": "answer q009",
+          "id": "q009",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.7067
+        },
+        {
+          "input": "question q010",
+          "target": "answer q010",
+          "id": "q010",
+          "prediction": "answer q010",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4004
+        },
+        {
+          "input": "question q011",
+          "target": "answer q011",
+          "id": "q011",
+          "prediction": "answer q011",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4776
+        },
+        {
+          "input": "question q012",
+          "target": "answer q012",
+          "id": "q012",
+          "prediction": "answer q012",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4118
+        },
+        {
+          "input": "question q013",
+          "target": "answer q013",
+          "id": "q013",
+          "prediction": "answer q013",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4291
+        },
+        {
+          "input": "question q014",
+          "target": "answer q014",
+          "id": "q014",
+          "prediction": "answer q014",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.599
+        },
+        {
+          "input": "question q015",
+          "target": "answer q015",
+          "id": "q015",
+          "prediction": "answer q015",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.6644
+        },
+        {
+          "input": "question q016",
+          "target": "answer q016",
+          "id": "q016",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4534
+        },
+        {
+          "input": "question q017",
+          "target": "answer q017",
+          "id": "q017",
+          "prediction": "answer q017",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4
+        },
+        {
+          "input": "question q018",
+          "target": "answer q018",
+          "id": "q018",
+          "prediction": "answer q018",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7267
+        },
+        {
+          "input": "question q019",
+          "target": "answer q019",
+          "id": "q019",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.602
+        },
+        {
+          "input": "question q020",
+          "target": "answer q020",
+          "id": "q020",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.7125
+        },
+        {
+          "input": "question q021",
+          "target": "answer q021",
+          "id": "q021",
+          "prediction": "answer q021",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4295
+        },
+        {
+          "input": "question q022",
+          "target": "answer q022",
+          "id": "q022",
+          "prediction": "answer q022",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7082
+        },
+        {
+          "input": "question q023",
+          "target": "answer q023",
+          "id": "q023",
+          "prediction": "answer q023",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.9472
+        },
+        {
+          "input": "question q024",
+          "target": "answer q024",
+          "id": "q024",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4536
+        },
+        {
+          "input": "question q025",
+          "target": "answer q025",
+          "id": "q025",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4125
+        },
+        {
+          "input": "question q026",
+          "target": "answer q026",
+          "id": "q026",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4078
+        },
+        {
+          "input": "question q027",
+          "target": "answer q027",
+          "id": "q027",
+          "prediction": "answer q027",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4745
+        },
+        {
+          "input": "question q028",
+          "target": "answer q028",
+          "id": "q028",
+          "prediction": "answer q028",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.9731
+        },
+        {
+          "input": "question q029",
+          "target": "answer q029",
+          "id": "q029",
+          "prediction": "answer q029",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7269
+        },
+        {
+          "input": "question q030",
+          "target": "answer q030",
+          "id": "q030",
+          "prediction": "answer q030",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4095
+        },
+        {
+          "input": "question q031",
+          "target": "answer q031",
+          "id": "q031",
+          "prediction": "answer q031",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.5176
+        },
+        {
+          "input": "question q032",
+          "target": "answer q032",
+          "id": "q032",
+          "prediction": "answer q032",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.9679
+        },
+        {
+          "input": "question q033",
+          "target": "answer q033",
+          "id": "q033",
+          "prediction": "answer q033",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.6587
+        },
+        {
+          "input": "question q034",
+          "target": "answer q034",
+          "id": "q034",
+          "prediction": "answer q034",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4096
+        },
+        {
+          "input": "question q035",
+          "target": "answer q035",
+          "id": "q035",
+          "prediction": "answer q035",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4121
+        },
+        {
+          "input": "question q036",
+          "target": "answer q036",
+          "id": "q036",
+          "prediction": "answer q036",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.9738
+        },
+        {
+          "input": "question q037",
+          "target": "answer q037",
+          "id": "q037",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4815
+        },
+        {
+          "input": "question q038",
+          "target": "answer q038",
+          "id": "q038",
+          "prediction": "answer q038",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.5482
+        },
+        {
+          "input": "question q039",
+          "target": "answer q039",
+          "id": "q039",
+          "prediction": "answer q039",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4135
+        },
+        {
+          "input": "question q040",
+          "target": "answer q040",
+          "id": "q040",
+          "prediction": "answer q040",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.6304
+        },
+        {
+          "input": "question q041",
+          "target": "answer q041",
+          "id": "q041",
+          "prediction": "answer q041",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4032
+        },
+        {
+          "input": "question q042",
+          "target": "answer q042",
+          "id": "q042",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.9218
+        },
+        {
+          "input": "question q043",
+          "target": "answer q043",
+          "id": "q043",
+          "prediction": "answer q043",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4177
+        },
+        {
+          "input": "question q044",
+          "target": "answer q044",
+          "id": "q044",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4984
+        },
+        {
+          "input": "question q045",
+          "target": "answer q045",
+          "id": "q045",
+          "prediction": "answer q045",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4031
+        },
+        {
+          "input": "question q046",
+          "target": "answer q046",
+          "id": "q046",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.7518
+        },
+        {
+          "input": "question q047",
+          "target": "answer q047",
+          "id": "q047",
+          "prediction": "answer q047",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.5503
+        },
+        {
+          "input": "question q048",
+          "target": "answer q048",
+          "id": "q048",
+          "prediction": "answer q048",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.5425
+        },
+        {
+          "input": "question q049",
+          "target": "answer q049",
+          "id": "q049",
+          "prediction": "answer q049",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7543
+        },
+        {
+          "input": "question q050",
+          "target": "answer q050",
+          "id": "q050",
+          "prediction": "answer q050",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4447
+        },
+        {
+          "input": "question q051",
+          "target": "answer q051",
+          "id": "q051",
+          "prediction": "answer q051",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.6557
+        },
+        {
+          "input": "question q052",
+          "target": "answer q052",
+          "id": "q052",
+          "prediction": "answer q052",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.8557
+        },
+        {
+          "input": "question q053",
+          "target": "answer q053",
+          "id": "q053",
+          "prediction": "answer q053",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4589
+        },
+        {
+          "input": "question q054",
+          "target": "answer q054",
+          "id": "q054",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4287
+        },
+        {
+          "input": "question q055",
+          "target": "answer q055",
+          "id": "q055",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.4054
+        },
+        {
+          "input": "question q056",
+          "target": "answer q056",
+          "id": "q056",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.9771
+        },
+        {
+          "input": "question q057",
+          "target": "answer q057",
+          "id": "q057",
+          "prediction": "answer q057",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.7504
+        },
+        {
+          "input": "question q058",
+          "target": "answer q058",
+          "id": "q058",
+          "prediction": "answer q058",
+          "score": 1,
+          "rationale": null,
+          "latency_seconds": 0.4687
+        },
+        {
+          "input": "question q059",
+          "target": "answer q059",
+          "id": "q059",
+          "prediction": "unknown",
+          "score": 0,
+          "rationale": null,
+          "latency_seconds": 0.8804
+        }
+      ]
+    }
+  ]
+}

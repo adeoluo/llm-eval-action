@@ -1,0 +1,127 @@
+name: Test action
+
+# Dogfoods the committed dist/ bundle through `uses: ./` against the fixtures in __fixtures__/.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  passing:
+    name: Passing scenario
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - id: gate
+        uses: ./
+        with:
+          results: __fixtures__/candidate-pass.jsonl
+          baseline: __fixtures__/baseline.jsonl
+          max-drop: '0.01'
+          max-latency-p95-increase: '0.10'
+          max-cost-increase: '0.05'
+          title: 'Self-test: passing scenario'
+          comment-on-pr: ${{ github.event_name == 'pull_request' }}
+      - name: Assert the gate passed
+        env:
+          PASSED: ${{ steps.gate.outputs.passed }}
+          OUTCOME: ${{ steps.gate.outputs.outcome }}
+          REGRESSED: ${{ steps.gate.outputs.regressed-metrics }}
+          REPORT: ${{ steps.gate.outputs.report-path }}
+          DELTAS: ${{ steps.gate.outputs.deltas }}
+        run: |
+          test "$PASSED" = "true"
+          test "$OUTCOME" = "pass"
+          test -z "$REGRESSED"
+          grep -q "passed" "$REPORT"
+          echo "$DELTAS" | jq -e '.exact_match.regressed == false and .f1.regressed == false'
+
+  regression:
+    name: Regression scenario (expected to fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: gate
+        uses: ./
+        continue-on-error: true
+        with:
+          results: __fixtures__/candidate-regression.jsonl
+          baseline: __fixtures__/baseline.jsonl
+          max-drop: '0.01'
+          mode: significance
+          title: 'Self-test: regression scenario (expected to fail)'
+      - name: Assert the gate failed the step
+        env:
+          STEP_OUTCOME: ${{ steps.gate.outcome }}
+          PASSED: ${{ steps.gate.outputs.passed }}
+          REGRESSED: ${{ steps.gate.outputs.regressed-metrics }}
+          DELTAS: ${{ steps.gate.outputs.deltas }}
+        run: |
+          test "$STEP_OUTCOME" = "failure"
+          test "$PASSED" = "false"
+          test "$REGRESSED" = "exact_match,f1"
+          echo "$DELTAS" | jq -e '.exact_match.test == "mcnemar-exact" and .exact_match.p_value < 0.05 and .f1.ci_high < 0'
+
+  harness-threshold:
+    name: evaluation-harness format, threshold mode (expected to fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: gate
+        uses: ./
+        continue-on-error: true
+        with:
+          # Real `evaluation-harness run --json` reports (keyword-sentiment vs constant-positive).
+          results: __fixtures__/harness-cli-constant-positive.json
+          baseline: __fixtures__/harness-cli-keyword-sentiment.json
+          mode: threshold
+          max-drop: sentiment=0.02
+          title: 'Self-test: evaluation-harness CLI reports'
+      - name: Assert the threshold gate failed
+        env:
+          STEP_OUTCOME: ${{ steps.gate.outcome }}
+          REGRESSED: ${{ steps.gate.outputs.regressed-metrics }}
+        run: |
+          test "$STEP_OUTCOME" = "failure"
+          test "$REGRESSED" = "sentiment"
+
+  upload-baseline:
+    name: Upload baseline artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/upload-artifact@v7
+        with:
+          name: eval-baseline
+          path: __fixtures__/baseline.jsonl
+          retention-days: 1
+
+  artifact-baseline:
+    name: Baseline from artifact
+    needs: upload-baseline
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+      - id: gate
+        uses: ./
+        with:
+          results: __fixtures__/candidate-pass.jsonl
+          baseline-artifact: eval-baseline
+          baseline-artifact-run-id: ${{ github.run_id }}
+          title: 'Self-test: baseline from artifact'
+      - name: Assert the gate passed
+        env:
+          PASSED: ${{ steps.gate.outputs.passed }}
+        run: test "$PASSED" = "true"

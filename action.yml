@@ -1,0 +1,139 @@
+name: LLM Eval Gate
+description: Gate pull requests on statistically tested LLM evaluation regressions against a baseline run.
+author: Adeolu Ogunnoiki
+branding:
+  icon: bar-chart-2
+  color: purple
+
+inputs:
+  results:
+    description: >
+      Path to the results file for this run (the candidate). JSONL, a JSON array of records,
+      an object with an "examples" array, or an evaluation-harness run record. Each record
+      needs an "id" and per-example metric values; "latency_ms"/"latency_seconds" and
+      "cost_usd"/"cost" are optional.
+    required: true
+  baseline:
+    description: >
+      Path to the baseline results file. When "baseline-artifact" is set, this is the path
+      of the file inside the downloaded artifact; leave it empty to use the only .json or
+      .jsonl file in the artifact.
+    required: false
+    default: ''
+  baseline-artifact:
+    description: >
+      Name of a workflow artifact that holds the baseline results (for example one uploaded
+      by a workflow on the default branch). Requires "actions: read" permission.
+    required: false
+    default: ''
+  baseline-artifact-run-id:
+    description: >
+      Workflow run id to take "baseline-artifact" from. When empty, the newest unexpired
+      artifact with that name on "baseline-artifact-branch" is used.
+    required: false
+    default: ''
+  baseline-artifact-branch:
+    description: >
+      Branch whose newest artifact is used when no run id is given. Defaults to the
+      repository's default branch.
+    required: false
+    default: ''
+  metrics:
+    description: >
+      Comma or newline separated metric names to gate on. Empty means every metric reported
+      by both runs.
+    required: false
+    default: ''
+  max-drop:
+    description: >
+      Largest allowed drop per metric, in the metric's own units (0.02 means two points of
+      accuracy on a 0 to 1 scale). Either one number for all metrics or "metric=value"
+      pairs, for example "exact_match=0.02, f1=0.01, 0.005" (a bare number is the default).
+    required: false
+    default: '0'
+  lower-is-better:
+    description: Comma separated metrics where a smaller value is better (for example error rates).
+    required: false
+    default: ''
+  mode:
+    description: >
+      "significance": fail when a metric drops by more than max-drop AND the paired test
+      gives p < alpha. "threshold": fail on any drop larger than max-drop, regardless of
+      significance.
+    required: false
+    default: significance
+  alpha:
+    description: Significance level for the paired tests (two-sided).
+    required: false
+    default: '0.05'
+  confidence-level:
+    description: Confidence level of the paired bootstrap interval reported for each delta.
+    required: false
+    default: '0.95'
+  bootstrap-samples:
+    description: Number of paired bootstrap resamples.
+    required: false
+    default: '10000'
+  seed:
+    description: Seed for the bootstrap random number generator, so reports are reproducible.
+    required: false
+    default: '1234'
+  top-regressions:
+    description: How many of the largest per-example regressions to list in the report.
+    required: false
+    default: '5'
+  max-latency-p95-increase:
+    description: >
+      Optional budget: fail when p95 latency grows by more than this fraction (0.2 means
+      +20 percent). Empty disables the check.
+    required: false
+    default: ''
+  max-cost-increase:
+    description: >
+      Optional budget: fail when total cost over aligned examples grows by more than this
+      fraction. Empty disables the check.
+    required: false
+    default: ''
+  fail-on-regression:
+    description: Fail the step when a regression is found. Set to false to report only.
+    required: false
+    default: 'true'
+  comment-on-pr:
+    description: >
+      Post the report as a pull request comment, editing the earlier comment on later runs.
+      Off by default. Needs "pull-requests: write"; on pull requests from forks the token
+      is read-only and the action only logs a warning.
+    required: false
+    default: 'false'
+  github-token:
+    description: >
+      Token used for artifact lookup and pull request comments. Defaults to the workflow's
+      own GITHUB_TOKEN; no personal token is needed.
+    required: false
+    default: ${{ github.token }}
+  report-path:
+    description: Where to write the Markdown report. Defaults to $RUNNER_TEMP/llm-eval-report.md.
+    required: false
+    default: ''
+  title:
+    description: Heading of the report and key of the pull request comment (use distinct titles for several gates).
+    required: false
+    default: LLM evaluation gate
+
+outputs:
+  passed:
+    description: '"true" when no metric regressed and every budget check passed, otherwise "false".'
+  outcome:
+    description: '"pass" or "fail".'
+  report-path:
+    description: Path of the Markdown report file.
+  deltas:
+    description: >
+      JSON object keyed by metric with n, baseline, candidate, delta, ci_low, ci_high,
+      p_value, test, cohens_d, max_drop and regressed.
+  regressed-metrics:
+    description: Comma separated names of the metrics that regressed (empty when none).
+
+runs:
+  using: node24
+  main: dist/index.js

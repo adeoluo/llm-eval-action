@@ -1,0 +1,47 @@
+{
+  "name": "llm-eval-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Action that gates pull requests on statistically tested LLM evaluation regressions.",
+  "author": "Adeolu Ogunnoiki",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "bench": "tsx scripts/benchmark.ts",
+    "report:sample": "tsx scripts/render-sample.ts",
+    "all": "npm run format:check && npm run lint && npm run typecheck && npm run coverage && npm run build"
+  },
+  "dependencies": {
+    "@actions/artifact": "^6.3.1",
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@rollup/plugin-commonjs": "^29.0.3",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.1",
+    "@types/node": "^24.19.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "rollup": "^4.67.4",
+    "tslib": "^2.9.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}

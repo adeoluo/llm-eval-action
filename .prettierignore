@@ -1,0 +1,7 @@
+dist/
+coverage/
+node_modules/
+package-lock.json
+__fixtures__/
+docs/sample-report.md
+benchmarks/results.md
