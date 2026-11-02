@@ -1,18 +1,28 @@
 # Changelog
 
-All notable changes are listed here. The project follows semantic versioning; while it is
-at 0.x, minor versions may change inputs.
+All notable changes to this project are documented here. The file is generated
+from Conventional Commits by [git-cliff](https://git-cliff.org) when a release is cut
+with `make cut-release`.
 
-## [0.1.0] - 2026-11-01
+## Unreleased
 
-### Added
+### Documentation
 
-- Paired comparison of per-example results aligned by id, for JSONL, JSON arrays,
-  `{examples}` objects and evaluation-harness reports.
-- Exact McNemar test for binary metrics, paired t-test for continuous metrics, seeded
-  paired bootstrap confidence intervals, Cohen's d_z.
-- `significance` and `threshold` gating modes, per-metric `max-drop`, `lower-is-better`.
-- Latency p50/p95 and cost deltas with optional budgets.
-- Markdown report in the job summary, outputs `passed`, `outcome`, `report-path`,
-  `deltas`, `regressed-metrics`.
-- Baseline from a workflow artifact; optional pull request comment.
+- Standard README structure and language framing (#3)
+- Horizontal layered architecture diagram
+- Compact horizontal architecture diagram
+
+### Build and CI
+
+- Do not post PR comments from the self-test workflow (#2)
+- Run CodeQL on main and on a weekly schedule only
+
+## [0.1.0] 2026-11-02
+
+### Features
+
+- LLM evaluation regression gate action (#1)
+
+### Maintenance
+
+- Initial commit with license and readme stub

@@ -1,0 +1,22 @@
+# LLM Eval Action
+
+> A GitHub Action that gates pull requests on statistically tested LLM evaluation regressions.
+
+Languages: TypeScript. License: MIT. Source: https://github.com/adeoluo/llm-eval-action
+
+## Docs
+
+- [README](https://github.com/adeoluo/llm-eval-action/blob/main/README.md): motivation, architecture, results, quickstart, usage, design decisions, testing, limitations, roadmap
+- [AGENTS.md](https://github.com/adeoluo/llm-eval-action/blob/main/AGENTS.md): layout, commands and conventions for changing the code
+- [Architecture diagram](https://github.com/adeoluo/llm-eval-action/blob/main/docs/architecture/architecture.mmd): Mermaid source of the component diagram
+- [Architecture](https://github.com/adeoluo/llm-eval-action/blob/main/docs/ARCHITECTURE.md)
+- [ADR 0001: TypeScript JavaScript action with a committed rollup bundle](https://github.com/adeoluo/llm-eval-action/blob/main/docs/adr/0001-typescript-action-with-committed-bundle.md)
+- [ADR 0002: Paired tests chosen by metric type, plus a paired bootstrap interval](https://github.com/adeoluo/llm-eval-action/blob/main/docs/adr/0002-paired-tests-by-metric-type.md)
+- [ADR 0003: Significance mode is the default; max-drop is also a minimum effect size](https://github.com/adeoluo/llm-eval-action/blob/main/docs/adr/0003-significance-mode-default.md)
+- [ADR 0004: Least privilege; artifact lookup and comments are opt-in](https://github.com/adeoluo/llm-eval-action/blob/main/docs/adr/0004-least-privilege-integrations.md)
+- [sample-report](https://github.com/adeoluo/llm-eval-action/blob/main/docs/sample-report.md)
+- [Changelog](https://github.com/adeoluo/llm-eval-action/blob/main/CHANGELOG.md): release history
+
+## Source
+
+- [src/random.ts](https://github.com/adeoluo/llm-eval-action/blob/main/src/random.ts): Mulberry32: a small, fast, seedable 32-bit PRNG.

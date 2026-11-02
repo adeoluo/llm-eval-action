@@ -1,4 +1,4 @@
-.PHONY: help install format format-check lint typecheck test coverage build check-dist bench sample fixtures all
+.PHONY: help install format format-check lint typecheck test coverage build check-dist bench sample fixtures all changelog cut-release
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -41,3 +41,9 @@ fixtures: ## Regenerate the seeded fixtures
 	npx tsx scripts/generate-fixtures.ts
 
 all: format-check lint typecheck coverage build ## Everything CI runs
+
+changelog: ## Regenerate CHANGELOG.md from Conventional Commits (git-cliff)
+	git cliff --output CHANGELOG.md && perl -0pi -e 's/\n+\z/\n/' CHANGELOG.md
+
+cut-release: ## Cut a release locally: version bump, changelog, tag, GitHub release (RELEASE_VERSION=vX.Y.Z optional)
+	scripts/release.sh $(RELEASE_VERSION)

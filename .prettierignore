@@ -5,3 +5,4 @@ package-lock.json
 __fixtures__/
 docs/sample-report.md
 benchmarks/results.md
+CHANGELOG.md

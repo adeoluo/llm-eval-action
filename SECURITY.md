@@ -22,7 +22,7 @@ The newest release behind the `v0` tag receives fixes.
 
 ## Controls in this repository
 
-- CodeQL (`.github/workflows/codeql.yml`) scans the TypeScript sources.
+- CodeQL on every push to `main` and weekly (`.github/workflows/codeql.yml`) scans the TypeScript sources.
 - GitHub secret scanning is enabled for the public repository.
 - Dependencies are locked in `package-lock.json` and installed with `npm ci`.
 - CI verifies that the committed `dist/` bundle matches a fresh build of the sources.
