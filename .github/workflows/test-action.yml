@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@v7
       - id: gate
@@ -30,7 +30,7 @@ jobs:
           max-latency-p95-increase: '0.10'
           max-cost-increase: '0.05'
           title: 'Self-test: passing scenario'
-          comment-on-pr: ${{ github.event_name == 'pull_request' }}
+          comment-on-pr: 'false'
       - name: Assert the gate passed
         env:
           PASSED: ${{ steps.gate.outputs.passed }}
