@@ -397,6 +397,18 @@ Rendering the sample comparison report a pull request receives.
   <img src="docs/demo/report.gif" alt="Rendering the sample comparison report a pull request receives" width="860">
 </p>
 
+The action run locally, as GitHub Actions runs it: a candidate within tolerance passes.
+
+<p align="center">
+  <img src="docs/demo/action-pass.gif" alt="The action run locally, as GitHub Actions runs it: a candidate within tolerance passes" width="860">
+</p>
+
+The same run on a regressed candidate: the step fails and names the metrics.
+
+<p align="center">
+  <img src="docs/demo/action-fail.gif" alt="The same run on a regressed candidate: the step fails and names the metrics" width="860">
+</p>
+
 ## Design decisions
 
 - **TypeScript JavaScript action, bundled into `dist/`** rather than a Docker or composite
