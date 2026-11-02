@@ -5,56 +5,13 @@ committed bundle `dist/index.js`, which rollup builds from `src/`.
 
 ## Data flow
 
-Data flow inside one workflow step:
+Data flow inside one workflow step (source: [architecture/architecture.mmd](architecture/architecture.mmd)):
 
-```mermaid
----
-title: llm-eval-action - data flow inside one workflow step
-config:
-  theme: base
-  themeVariables:
-    fontFamily: "Inter, system-ui, sans-serif"
-    primaryColor: "#F8FAFC"
-    primaryBorderColor: "#1E293B"
-    primaryTextColor: "#1E293B"
-    lineColor: "#64748B"
-    clusterBkg: "#E2E8F0"
-    clusterBorder: "#94A3B8"
----
-flowchart LR
-    classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef external fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
-    classDef danger   fill:#EF4444,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+<p align="center">
+  <img src="architecture/architecture.svg" alt="Architecture diagram" width="860">
+</p>
 
-    PR[(PR results<br/>JSONL / JSON)]:::data
-    Base[(Baseline file)]:::data
-    Art([Workflow artifact<br/>from main]):::external
-
-    subgraph Action["llm-eval-action (node24, dist/index.js)"]
-        Inputs[inputs.ts<br/>validate inputs]:::core
-        Parse[parse.ts<br/>normalize records]:::core
-        Align[align.ts<br/>pair by id]:::core
-        Stats[stats.ts<br/>bootstrap CI, McNemar,<br/>paired t, Cohen's d]:::core
-        Analyze[analyze.ts<br/>verdict per metric,<br/>latency, cost]:::core
-        Report[report.ts<br/>Markdown report]:::core
-    end
-
-    Summary([Job summary]):::external
-    Outputs([Step outputs<br/>passed, deltas]):::external
-    Comment([PR comment<br/>opt-in]):::external
-    Fail{{core.setFailed}}:::danger
-
-    Art -- "baseline-artifact" --> Base
-    PR --> Parse
-    Base --> Parse
-    Inputs --> Analyze
-    Parse --> Align --> Stats --> Analyze --> Report
-    Report --> Summary
-    Report --> Comment
-    Analyze --> Outputs
-    Analyze -- "regression" --> Fail
-```
+<sub>Legend: amber = entry points and external systems, indigo = core logic, green = data and state, blue = validation and control, grey = observability and outputs.</sub>
 
 ## Modules
 

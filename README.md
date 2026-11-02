@@ -36,9 +36,16 @@ examples that got worse without leaving the pull request.
   <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
 </p>
 
-Every module except `runtime.ts` (the thin adapter over `@actions/core`, `@actions/github`
-and `@actions/artifact`) is a pure function of its inputs, which keeps the statistics
-testable without a runner. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the
+<sub>Legend: amber = entry points and external systems, indigo = core logic, green = data and state, blue = validation and control, grey = observability and outputs.</sub>
+
+A workflow step passes its inputs through `runtime.ts` to `run()`, which validates them,
+optionally downloads the baseline artifact, parses both result files, pairs examples by id,
+computes paired statistics, and applies the threshold or significance gate. The report goes
+to the job summary and report file, the step outputs carry the verdict and deltas, and the
+opt-in pull request comment is created or updated. Every module except `runtime.ts` (the
+thin adapter over `@actions/core`, `@actions/github` and `@actions/artifact`) is a pure
+function of its inputs, which keeps the statistics testable without a runner. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the
 [architecture decision records](docs/adr/).
 
 ### Statistical method
