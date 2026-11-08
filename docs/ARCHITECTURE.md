@@ -32,39 +32,11 @@ Data flow inside one workflow step (source: [architecture/architecture.mmd](arch
 
 ## Control flow
 
-```mermaid
----
-title: run() control flow
-config:
-  theme: base
-  themeVariables:
-    fontFamily: "Inter, system-ui, sans-serif"
-    primaryColor: "#F8FAFC"
-    primaryBorderColor: "#1E293B"
-    primaryTextColor: "#1E293B"
-    lineColor: "#64748B"
----
-flowchart TD
-    classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef external fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
-    classDef danger   fill:#EF4444,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+<p align="center">
+  <img src="architecture/control-flow.svg" alt="Control flow diagram" width="860">
+</p>
 
-    A[parseInputs]:::core --> B{baseline-artifact set?}
-    B -- yes --> C[downloadBaseline<br/>findInRun or findLatest]:::external
-    B -- no --> D[read baseline file]:::core
-    C --> D
-    D --> E[parseResults x2]:::core
-    E --> F[analyze]:::core
-    F --> G[renderReport]:::core
-    G --> H[write report file + job summary]:::external
-    H --> I[set outputs]:::core
-    I --> J{comment-on-pr?}
-    J -- yes --> K[upsertComment<br/>warn on failure]:::external
-    J -- no --> L{passed?}
-    K --> L
-    L -- no --> M[setFailed or warning]:::danger
-    L -- yes --> N[info]:::core
-```
+<sub>Legend: amber = entry points and external systems, indigo = core logic, green = data and state, blue = validation and control, grey = observability and outputs.</sub>
 
 Any thrown error (bad input, unreadable file, malformed record, missing metric) ends in
 `setFailed` with the error message, so misconfiguration fails loudly instead of passing.

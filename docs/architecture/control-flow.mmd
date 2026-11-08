@@ -1,0 +1,30 @@
+flowchart LR
+    classDef edge     fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
+    classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef obs      fill:#CBD5E1,stroke:#1E293B,color:#1E293B,stroke-width:1px;
+    subgraph Inputs["Inputs"]
+        direction TB
+        A["parseInputs"]:::core --> B{"artifact?"}:::control
+        B -- yes --> C["downloadBaseline<br/>findInRun or findLatest"]:::edge
+        B -- no --> D["read baseline file"]:::core
+        C --> D
+    end
+    subgraph Analyze["Analyze"]
+        direction TB
+        E["parseResults x2"]:::core --> F["analyze"]:::core
+        F --> G["renderReport"]:::core
+    end
+    subgraph Publish["Publish and verdict"]
+        direction TB
+        H["write report file<br/>+ job summary"]:::edge --> I["set outputs"]:::core
+        I --> J{"comment?"}:::control
+        J -- yes --> K["upsertComment<br/>warn on failure"]:::edge
+        J -- no --> L{"passed?"}:::control
+        K --> L
+        L -- no --> M["setFailed or warning"]:::obs
+        L -- yes --> N["info"]:::obs
+    end
+    Inputs -->|baseline + candidate| Analyze
+    Analyze -->|report| Publish
