@@ -20,6 +20,9 @@ function escapeDashes(): Plugin {
 
 const config: RollupOptions = {
   input: 'src/index.ts',
+  // Optional native module that proxy-agent-negotiate loads with a guarded dynamic import, only
+  // for Negotiate proxy authentication; it is never bundled.
+  external: ['kerberos'],
   output: {
     file: 'dist/index.js',
     format: 'es',
